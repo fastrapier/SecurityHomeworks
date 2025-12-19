@@ -44,3 +44,15 @@ make
 ```
 
 [Подробнее →](./task_1_brutforce/)
+
+---
+
+### Задание 2: Брутфорс SSH с Medusa
+
+```bash
+cd task_2_medusa
+make
+```
+
+[Подробнее →](./task_2_medusa/)
+
