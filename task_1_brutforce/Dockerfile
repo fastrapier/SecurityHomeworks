@@ -1,0 +1,31 @@
+FROM kalilinux/kali-rolling
+
+# Обновление системы и установка необходимых пакетов
+RUN apt-get update && \
+    apt-get install -y \
+    john \
+    john-data \
+    p7zip-full \
+    wordlists \
+    perl \
+    libcompress-raw-lzma-perl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Создаём рабочую директорию
+WORKDIR /task
+
+# Копируем только необходимые файлы
+COPY flag.7z /task/
+COPY bruteforce.sh /task/
+
+# Даём права на выполнение скрипта
+RUN chmod +x /task/bruteforce.sh
+
+# Информация о контейнере
+LABEL description="Kali Linux container для брутфорса 7z архива с помощью John The Ripper"
+LABEL author="Студеникин Даниил 11-312"
+
+# Автоматический запуск брутфорса при старте контейнера
+CMD ["./bruteforce.sh"]
+

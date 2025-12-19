@@ -1,0 +1,19 @@
+# Git
+.git
+.gitignore
+# Python
+__pycache__
+*.py[cod]
+.venv
+venv/
+# IDE
+.idea/
+.vscode/
+# OS
+.DS_Store
+# Документация (не нужна в образе)
+README.md
+# Результаты работы
+flag.hash
+*.pot
+john.rec

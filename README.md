@@ -31,3 +31,16 @@
 Дата: 19.12.2025
 
 Ссылка на презентацию: [Google Slides](https://docs.google.com/presentation/d/1Cl8YQd-M-Su3FNpN_oN7RlbRvjyLMf8URfjXL_yBPDo/edit?usp=sharing)
+
+---
+
+## Практические задания
+
+### Задание 1: Брутфорс 7z архива
+
+```bash
+cd task_1_brutforce
+make
+```
+
+[Подробнее →](./task_1_brutforce/)
