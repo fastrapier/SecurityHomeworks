@@ -1,6 +1,6 @@
 # Домашки по ИБ ИТИС 2025
 
-[![Security Tasks CI](https://github.com/ВСТАВЬТЕ_ВАШ_USERNAME/SecurityHomeworks/actions/workflows/security-tasks.yml/badge.svg)](https://github.com/ВСТАВЬТЕ_ВАШ_USERNAME/SecurityHomeworks/actions/workflows/security-tasks.yml)
+[![Security Tasks CI](https://github.com/fastrapier/SecurityHomeworks/actions/workflows/security-tasks.yml/badge.svg)](https://github.com/fastrapier/SecurityHomeworks/actions/workflows/security-tasks.yml)
 
 ---
 
