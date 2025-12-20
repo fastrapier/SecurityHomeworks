@@ -1,3 +1,35 @@
+# IDE
 .idea
 
+# Python
 .venv
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Docker
+*.log
+
+# Task results
+task_1_brutforce/flag.txt
+task_1_brutforce/flag.hash
+task_1_brutforce/results/
+task_1_brutforce/*.pot
+task_1_brutforce/.john/
+
+task_2_medusa/medusa_output.txt
+task_2_medusa/results/
+
+# CI/CD artifacts
+results/
+*.pot
+*.session
+
+# macOS
+.DS_Store
+
+# Temporary files
+*.tmp
+*.bak
+*~
+
