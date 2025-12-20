@@ -76,6 +76,29 @@ make
 
 ---
 
+### Задание 4: Keylogger Demo - Мониторинг клавиатуры
+
+Учебная демонстрация техники Input Capture: Keylogging (MITRE ATT&CK T1056.001).
+
+**⚠️ Только для учебных целей с явного согласия пользователя!**
+
+```bash
+cd task_4_keylogger
+make install
+make run
+```
+
+**Особенности:**
+- Явный запрос согласия перед запуском
+- Автоматическое ограничение времени работы (30 сек / 100 нажатий)
+- Простой код с подробными комментариями
+- Запись в текстовый лог-файл с временными метками
+- Без обфускации и скрытности
+
+[Подробнее →](./task_4_keylogger/)
+
+---
+
 ## CI/CD
 
 Проект использует GitHub Actions для проверки заданий.
@@ -104,6 +127,15 @@ make turbo
 # Task 2
 cd task_2_medusa
 make
+
+# Task 3
+cd task_3_windows_killer
+make
+
+# Task 4
+cd task_4_keylogger
+make install
+make run
 ```
 
 ### Структура CI/CD
@@ -118,8 +150,13 @@ make
 
 ## Требования
 
-- Docker
+- Docker (для Task 1, 2, 3)
+- Python 3.8+ (для Task 4)
 - Make (для удобного запуска)
+
+### Дополнительно для Task 4:
+- pip для установки зависимостей
+- На macOS: разрешения для Input Monitoring в System Preferences
 
 ---
 
