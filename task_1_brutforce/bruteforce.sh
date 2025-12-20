@@ -64,42 +64,62 @@ extract_hash() {
 show_menu() {
     echo "Выберите метод брутфорса:"
     echo "1) Словарная атака (по умолчанию)"
-    echo "2) Словарная атака с rockyou.txt (Kali Linux)"
-    echo "3) Инкрементальный режим (медленно, но надежно)"
+    echo "2) Словарная атака с rockyou.txt"
+    echo "3) Инкрементальный режим"
+    echo "4) Быстрый режим (топ 10K паролей)"
     echo ""
-    read -p "Ваш выбор [1-3]: " choice
+    read -p "Ваш выбор [1-4]: " choice
     echo ""
 }
 
 # Брутфорс
 bruteforce() {
     echo -e "${YELLOW}[*] Начинаем брутфорс...${NC}"
-    echo -e "${YELLOW}[*] Это может занять некоторое время. Нажмите Ctrl+C для отмены.${NC}"
     echo ""
+
+    # Определяем количество CPU
+    CPU_CORES=$(nproc 2>/dev/null || echo "4")
+    JOHN_OPTS="--progress-every=5 --fork=$CPU_CORES"
+
+    # Проверяем GPU
+    if john --list=opencl-devices 2>/dev/null | grep -q "Device #"; then
+        echo -e "${GREEN}[+] Используем GPU ускорение${NC}"
+        JOHN_OPTS="--format=7z-opencl $JOHN_OPTS"
+    fi
 
     case $choice in
         1)
             echo -e "${YELLOW}[*] Используем встроенный словарь John...${NC}"
-            john --progress-every=5 flag.hash
+            john $JOHN_OPTS flag.hash
             ;;
         2)
             if [ -f "/usr/share/wordlists/rockyou.txt" ]; then
                 echo -e "${YELLOW}[*] Используем словарь rockyou.txt...${NC}"
-                john --progress-every=5 --wordlist=/usr/share/wordlists/rockyou.txt flag.hash
+                john $JOHN_OPTS --wordlist=/usr/share/wordlists/rockyou.txt flag.hash
             elif [ -f "/usr/share/wordlists/rockyou.txt.gz" ]; then
                 echo -e "${YELLOW}[*] Распаковываем rockyou.txt.gz...${NC}"
                 gunzip /usr/share/wordlists/rockyou.txt.gz
-                echo -e "${YELLOW}[*] Используем словарь rockyou.txt...${NC}"
-                john --progress-every=5 --wordlist=/usr/share/wordlists/rockyou.txt flag.hash
+                john $JOHN_OPTS --wordlist=/usr/share/wordlists/rockyou.txt flag.hash
             else
-                echo -e "${RED}[!] rockyou.txt не найден!${NC}"
-                echo -e "${YELLOW}[*] Используем встроенный словарь John в качестве альтернативы...${NC}"
-                john --progress-every=5 flag.hash
+                echo -e "${RED}[!] rockyou.txt не найден${NC}"
+                echo -e "${YELLOW}[*] Используем встроенный словарь...${NC}"
+                john $JOHN_OPTS flag.hash
             fi
             ;;
         3)
             echo -e "${YELLOW}[*] Используем инкрементальный режим...${NC}"
-            john --progress-every=5 --incremental flag.hash
+            john $JOHN_OPTS --incremental flag.hash
+            ;;
+        4)
+            echo -e "${YELLOW}[*] Быстрый режим (топ 10K паролей)...${NC}"
+
+            if [ -f "/usr/share/wordlists/rockyou.txt" ]; then
+                head -n 10000 /usr/share/wordlists/rockyou.txt > /tmp/rockyou_turbo.txt
+                john $JOHN_OPTS --wordlist=/tmp/rockyou_turbo.txt flag.hash
+            else
+                echo -e "${RED}[!] rockyou.txt не найден${NC}"
+                john $JOHN_OPTS flag.hash
+            fi
             ;;
         *)
             echo -e "${RED}[!] Неверный выбор!${NC}"

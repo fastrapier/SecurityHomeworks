@@ -49,55 +49,35 @@ jobs:
       - name: Сборка Docker образа для Task 1
         working-directory: ./task_1_brutforce
         run: |
-          echo "🔨 Сборка образа kali-bruteforce..."
+          echo "Сборка образа kali-bruteforce..."
           docker build -t kali-bruteforce .
 
       - name: Запуск брутфорса 7z архива
         working-directory: ./task_1_brutforce
         run: |
-          echo "🚀 Запуск контейнера для брутфорса..."
-          echo "Автоматически выбираем метод 2 (rockyou.txt)"
-          echo "2" | docker run -i --rm kali-bruteforce || {
-            echo "⚠️ Контейнер завершился с ошибкой, но это может быть нормально"
-            echo "Продолжаем извлечение результатов..."
+          echo "Запуск брутфорса (топ 10K паролей)..."
+          docker run --rm -e WORDLIST_SIZE=10000 kali-bruteforce /task/bruteforce_turbo.sh || {
+            echo "Пароль не найден в топ 10K, пробуем топ 50K..."
+            docker run --rm -e WORDLIST_SIZE=50000 kali-bruteforce /task/bruteforce_turbo.sh || {
+              echo "Пароль не найден. Для полного поиска запустите локально: make full"
+            }
           }
 
-      - name: Извлечение результатов из контейнера
+      - name: Сохранение результатов Task 1
         if: always()
         working-directory: ./task_1_brutforce
         run: |
-          echo "📊 Извлечение результатов..."
-          
-          # Создаем директорию для результатов
+          echo "Сохранение результатов..."
           mkdir -p results
           
-          # Запускаем контейнер с автоматическим выбором метода и сохраняем его ID
-          echo "Запускаем контейнер для извлечения результатов..."
-          CONTAINER_ID=$(echo "2" | docker run -i -d kali-bruteforce)
-          
-          # Ждем немного для завершения
-          sleep 5
-          
-          # Копируем результаты
-          docker cp $CONTAINER_ID:/task/flag.hash ./results/ 2>/dev/null || echo "⚠️ flag.hash не найден"
-          docker cp $CONTAINER_ID:/task/flag.txt ./results/ 2>/dev/null || echo "⚠️ flag.txt не найден"
-          
-          # Получаем логи контейнера
-          docker logs $CONTAINER_ID > ./results/container_output.log 2>&1 || echo "⚠️ Не удалось получить логи"
-          
-          # Останавливаем и удаляем контейнер
-          docker stop $CONTAINER_ID 2>/dev/null || true
+          CONTAINER_ID=$(docker create kali-bruteforce)
+          docker cp $CONTAINER_ID:/task/flag.hash ./results/ 2>/dev/null || true
+          docker cp $CONTAINER_ID:/task/flag.txt ./results/ 2>/dev/null || true
+          docker cp $CONTAINER_ID:/root/.john/john.pot ./results/ 2>/dev/null || true
           docker rm $CONTAINER_ID 2>/dev/null || true
           
-          echo ""
-          echo "📁 Результаты Task 1:"
-          ls -la results/ || echo "Нет результатов"
-          
-          if [ -f results/flag.txt ]; then
-            echo ""
-            echo "📄 Содержимое flag.txt:"
-            cat results/flag.txt
-          fi
+          echo "Результаты Task 1:"
+          ls -la results/ 2>/dev/null || echo "Нет результатов"
 
       - name: Загрузка артефактов Task 1
         if: always()
