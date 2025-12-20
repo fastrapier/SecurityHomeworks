@@ -63,6 +63,19 @@ make
 
 ---
 
+### Задание 3: Windows Killer - File Masquerading
+
+Демонстрация техники маскировки вредоносных файлов (MITRE ATT&CK T1036).
+
+```bash
+cd task_3_windows_killer
+make
+```
+
+[Подробнее →](./task_3_windows_killer/)
+
+---
+
 ## CI/CD
 
 Проект использует GitHub Actions для проверки заданий.

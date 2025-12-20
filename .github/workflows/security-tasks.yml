@@ -14,6 +14,11 @@ on:
         required: false
         default: true
         type: boolean
+      run_task_3:
+        description: 'Запустить Task 3 (Windows Killer)'
+        required: false
+        default: true
+        type: boolean
 
 jobs:
   task-1-bruteforce:
@@ -152,10 +157,52 @@ jobs:
           path: task_2_medusa/results/
           if-no-files-found: warn
 
+  task-3-windows-killer:
+    name: Task 3 - Windows Killer (File Masquerading)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    # Условие запуска: если это не workflow_dispatch или если выбрано в UI
+    if: |
+      github.event_name != 'workflow_dispatch' || 
+      github.event.inputs.run_task_3 == 'true'
+
+    steps:
+      - name: Checkout репозитория
+        uses: actions/checkout@v4
+
+      - name: Информация о системе
+        run: |
+          echo "Runner OS: ${{ runner.os }}"
+          echo "Docker version:"
+          docker --version
+          echo "Доступное место на диске:"
+          df -h
+
+      - name: Сборка Docker образа для Task 3
+        working-directory: ./task_3_windows_killer
+        run: |
+          echo "Сборка образа windows-killer..."
+          docker build -t windows-killer .
+
+      - name: Запуск демонстрации Windows Killer
+        working-directory: ./task_3_windows_killer
+        run: |
+          echo "Запуск демонстрации File Masquerading..."
+          docker run --rm windows-killer
+
+      - name: Загрузка артефактов Task 3
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: task-3-results
+          path: task_3_windows_killer/results/
+          if-no-files-found: ignore
+
   summary:
     name: Итоговый отчет
     runs-on: ubuntu-latest
-    needs: [task-1-bruteforce, task-2-medusa]
+    needs: [task-1-bruteforce, task-2-medusa, task-3-windows-killer]
     if: always()
 
     steps:
@@ -165,12 +212,13 @@ jobs:
           echo ""
           echo "Task 1 (7z Bruteforce): ${{ needs.task-1-bruteforce.result }}"
           echo "Task 2 (SSH Medusa): ${{ needs.task-2-medusa.result }}"
+          echo "Task 3 (Windows Killer): ${{ needs.task-3-windows-killer.result }}"
           echo ""
           
-          if [ "${{ needs.task-1-bruteforce.result }}" == "success" ] && [ "${{ needs.task-2-medusa.result }}" == "success" ]; then
+          if [ "${{ needs.task-1-bruteforce.result }}" == "success" ] && [ "${{ needs.task-2-medusa.result }}" == "success" ] && [ "${{ needs.task-3-windows-killer.result }}" == "success" ]; then
             echo "Все задания выполнены успешно"
             exit 0
-          elif [ "${{ needs.task-1-bruteforce.result }}" == "skipped" ] || [ "${{ needs.task-2-medusa.result }}" == "skipped" ]; then
+          elif [ "${{ needs.task-1-bruteforce.result }}" == "skipped" ] || [ "${{ needs.task-2-medusa.result }}" == "skipped" ] || [ "${{ needs.task-3-windows-killer.result }}" == "skipped" ]; then
             echo "Некоторые задания были пропущены"
             exit 0
           else
