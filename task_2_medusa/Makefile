@@ -16,7 +16,7 @@ clean:
 	@echo "Очистка контейнеров и образа..."
 	-docker rm $$(docker ps -a -q --filter ancestor=$(IMAGE_NAME)) 2>/dev/null
 	-docker rmi $(IMAGE_NAME) 2>/dev/null
-	@echo "Очистка завершена!"
+	@echo "Очистка завершена"
 
 help:
 	@echo "Доступные команды:"

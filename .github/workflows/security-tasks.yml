@@ -40,10 +40,10 @@ jobs:
 
       - name: Информация о системе
         run: |
-          echo "🖥️ Runner OS: ${{ runner.os }}"
-          echo "📦 Docker version:"
+          echo "Runner OS: ${{ runner.os }}"
+          echo "Docker version:"
           docker --version
-          echo "💾 Доступное место на диске:"
+          echo "Доступное место на диске:"
           df -h
 
       - name: Сборка Docker образа для Task 1
@@ -103,45 +103,52 @@ jobs:
 
       - name: Информация о системе
         run: |
-          echo "🖥️ Runner OS: ${{ runner.os }}"
-          echo "📦 Docker version:"
+          echo "Runner OS: ${{ runner.os }}"
+          echo "Docker version:"
           docker --version
-          echo "💾 Доступное место на диске:"
+          echo "Доступное место на диске:"
           df -h
 
       - name: Сборка Docker образа для Task 2
         working-directory: ./task_2_medusa
         run: |
-          echo "🔨 Сборка образа kali-medusa..."
+          echo "Сборка образа kali-medusa..."
           docker build -t kali-medusa .
 
       - name: Запуск брутфорса SSH с Medusa
         working-directory: ./task_2_medusa
         run: |
-          echo "🚀 Запуск контейнера для брутфорса SSH..."
-          docker run --rm kali-medusa
+          echo "Запуск контейнера для брутфорса SSH..."
+          CONTAINER_ID=$(docker run -d kali-medusa)
+          echo "MEDUSA_CONTAINER_ID=$CONTAINER_ID" >> $GITHUB_ENV
+          
+          # Ждем завершения
+          docker wait $CONTAINER_ID || true
+          
+          # Показываем логи
+          echo "Логи контейнера:"
+          docker logs $CONTAINER_ID
 
       - name: Извлечение результатов из контейнера
         if: always()
         working-directory: ./task_2_medusa
         run: |
-          echo "📊 Извлечение результатов..."
-          
-          # Создаем директорию для результатов
+          echo "Извлечение результатов..."
           mkdir -p results
           
-          # Запускаем контейнер и копируем результаты
-          CONTAINER_ID=$(docker create kali-medusa)
-          docker cp $CONTAINER_ID:/task/medusa_output.txt ./results/ 2>/dev/null || echo "⚠️ medusa_output.txt не найден"
-          docker rm $CONTAINER_ID
+          # Копируем результаты из сохраненного контейнера
+          docker cp $MEDUSA_CONTAINER_ID:/task/medusa_output.txt ./results/ 2>/dev/null || echo "medusa_output.txt не найден"
+          
+          # Удаляем контейнер
+          docker rm $MEDUSA_CONTAINER_ID 2>/dev/null || true
           
           echo ""
-          echo "📁 Результаты Task 2:"
+          echo "Результаты Task 2:"
           ls -la results/ || echo "Нет результатов"
           
           if [ -f results/medusa_output.txt ]; then
             echo ""
-            echo "📄 Содержимое medusa_output.txt:"
+            echo "Содержимое medusa_output.txt:"
             cat results/medusa_output.txt
           fi
 
@@ -162,20 +169,20 @@ jobs:
     steps:
       - name: Проверка результатов
         run: |
-          echo "📊 Сводка выполнения заданий:"
+          echo "Сводка выполнения заданий:"
           echo ""
           echo "Task 1 (7z Bruteforce): ${{ needs.task-1-bruteforce.result }}"
           echo "Task 2 (SSH Medusa): ${{ needs.task-2-medusa.result }}"
           echo ""
           
           if [ "${{ needs.task-1-bruteforce.result }}" == "success" ] && [ "${{ needs.task-2-medusa.result }}" == "success" ]; then
-            echo "✅ Все задания выполнены успешно!"
+            echo "Все задания выполнены успешно"
             exit 0
           elif [ "${{ needs.task-1-bruteforce.result }}" == "skipped" ] || [ "${{ needs.task-2-medusa.result }}" == "skipped" ]; then
-            echo "⏭️ Некоторые задания были пропущены"
+            echo "Некоторые задания были пропущены"
             exit 0
           else
-            echo "❌ Некоторые задания завершились с ошибками"
+            echo "Некоторые задания завершились с ошибками"
             exit 1
           fi
 
