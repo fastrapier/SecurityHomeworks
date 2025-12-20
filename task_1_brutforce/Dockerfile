@@ -12,6 +12,11 @@ RUN apt-get update && \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Распаковка rockyou.txt если он сжат
+RUN if [ -f /usr/share/wordlists/rockyou.txt.gz ]; then \
+        gunzip /usr/share/wordlists/rockyou.txt.gz; \
+    fi
+
 # Создаём рабочую директорию
 WORKDIR /task
 

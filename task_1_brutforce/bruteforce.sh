@@ -86,8 +86,15 @@ bruteforce() {
             if [ -f "/usr/share/wordlists/rockyou.txt" ]; then
                 echo -e "${YELLOW}[*] Используем словарь rockyou.txt...${NC}"
                 john --progress-every=5 --wordlist=/usr/share/wordlists/rockyou.txt flag.hash
+            elif [ -f "/usr/share/wordlists/rockyou.txt.gz" ]; then
+                echo -e "${YELLOW}[*] Распаковываем rockyou.txt.gz...${NC}"
+                gunzip /usr/share/wordlists/rockyou.txt.gz
+                echo -e "${YELLOW}[*] Используем словарь rockyou.txt...${NC}"
+                john --progress-every=5 --wordlist=/usr/share/wordlists/rockyou.txt flag.hash
             else
                 echo -e "${RED}[!] rockyou.txt не найден!${NC}"
+                echo -e "${YELLOW}[*] Используем встроенный словарь John в качестве альтернативы...${NC}"
+                john --progress-every=5 flag.hash
             fi
             ;;
         3)
