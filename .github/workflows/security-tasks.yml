@@ -1,15 +1,7 @@
 name: Security Tasks CI
 
 on:
-  # Запуск при push в main ветку
-  push:
-    branches: [ main, master ]
-
-  # Запуск при pull request
-  pull_request:
-    branches: [ main, master ]
-
-  # Ручной запуск из GitHub UI
+  # Только ручной запуск из GitHub UI
   workflow_dispatch:
     inputs:
       run_task_1:
